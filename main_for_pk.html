@@ -16,24 +16,24 @@
           touchpad.addEventListener("mousemove", function () {
             but2.click();
             var delta_x = String(Number(event.pageX) -
-            Number(document.getElementById("coords_x").textContent))
+            Number(document.getElementById("coords_x").value))
             var delta_y = String(Number(event.pageY) -
-            Number(document.getElementById("coords_y").textContent))
+            Number(document.getElementById("coords_y").value))
 
-            document.getElementById("delta").innerHTML = delta_x + ':' + delta_y;
+            document.getElementById("delta").value = delta_x + ':' + delta_y;
 
-            document.getElementById("coords_x").innerHTML = event.pageX;
-            document.getElementById("coords_y").innerHTML = event.pageY;
+            document.getElementById("coords_x").value = event.pageX;
+            document.getElementById("coords_y").value = event.pageY;
           })
 
 
           let lkm = document.getElementById("LKM");
           lkm.addEventListener("mousedown", LefthandleStart, false);
-          lkm.addEventListener("click", LefthandleEnd, false);
+          lkm.addEventListener("mouseup", LefthandleEnd, false);
 
           let pkm = document.getElementById("PKM");
           pkm.addEventListener("mousedown", RighthandleStart, false);
-          pkm.addEventListener("click", RighthandleEnd, false);
+          pkm.addEventListener("mouseup", RighthandleEnd, false);
         }
 
 
@@ -42,32 +42,19 @@
             console.log("Данные переданы");
         }
 
-        function handleMove() {
-            but2.click();
-            var delta_x = String(Number(event.pageX) -
-            Number(document.getElementById("coords_x").textContent))
-            var delta_y = String(Number(event.pageY) -
-            Number(document.getElementById("coords_y").textContent))
-
-            document.getElementById("delta").innerHTML = delta_x + ':' + delta_y;
-
-            document.getElementById("coords_x").innerHTML = event.pageX;
-            document.getElementById("coords_y").innerHTML = event.pageY;
-        }
-
         function LefthandleStart() {
-            document.getElementById("last_event").innerHTML = 'Последнее событие - зажатие левой кнопки мыши';
+            document.getElementById("last_event_LKM").value = 'Зажата ЛКМ';
         }
         function LefthandleEnd() {
-            document.getElementById("last_event").innerHTML = 'Последнее событие - клик левой кнопкой мыши';
+            document.getElementById("last_event_LKM").value = 'Отпущена ЛКМ';
         }
 
         function RighthandleStart() {
-            document.getElementById("last_event").innerHTML = 'Последнее событие - зажатие правой кнопки мыши';
+            document.getElementById("last_event_PKM").value = 'Зажата ПКМ';
         }
 
         function RighthandleEnd() {
-            document.getElementById("last_event").innerHTML = 'Последнее событие - клик правой кнопкой мыши';
+            document.getElementById("last_event_PKM").value = 'Отпущена ПКМ';
         }
     </script>
 <title>Код JavaScript в HTML-документе</title>
@@ -164,13 +151,24 @@
         </style>
     </head>
     <body>
-        <button class="hider">1</button>
+        <input type="button" class="hider">1</input>
         <button class="touchpad" id="touchpad">Правая кнопка мыши</button>
         <button class="lkm" id="LKM">Левая кнопка мыши</button>
         <button class="pkm" id="PKM">Правая кнопка мыши</button>
-        <h1><p class="last_event">Последнее событие - undefined</p></h1>
+        <!--
+        <h1><p id="last_event">Последнее событие - undefined</p></h1>
         <h1><p id="coords_x">0</p></h1>
         <h1><p id="coords_y">0</p></h1>
         <h1><p id="delta">0:0</p></h1>
+        -->
+        <form>
+        <p><b>Данные</b></p>
+        <p><input type="text" name="дельта" value="0:0" id="delta"><Br>
+        <input type="text" name="действие ЛКМ" value="undefined" id="last_event_LKM"><Br>
+        <input type="text" name="действие ПКМ" value="undefined" id="last_event_PKM"><Br>
+        <input type="text" name="координата_х" value="0" id="coords_x"><Br>
+        <input type="text" name="координата_у" value="0" id="coords_y"><Br></p>
+        <p><input type="submit"></p>
+        </form>
     </body>
 </html>
