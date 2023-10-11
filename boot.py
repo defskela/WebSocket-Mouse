@@ -2,8 +2,8 @@
 import network
 
 # Replace the following with your WIFI Credentials
-SSID = "Onlime-60"
-SSI_PASSWORD = "9032187912"
+SSID = "Your SSID"
+SSI_PASSWORD = "Your Password"
 
 def do_connect():
     import network
