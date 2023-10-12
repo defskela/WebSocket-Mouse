@@ -52,21 +52,6 @@ class WebSocket(BaseWebSocket):
 
 
 async def websocket_upgrade(request):
-    """Upgrade a request handler to a websocket connection.
-
-    This function can be called directly inside a route function to process a
-    WebSocket upgrade handshake, for example after the user's credentials are
-    verified. The function returns the websocket object::
-
-        @app.route('/echo')
-        async def echo(request):
-            if not authenticate_user(request):
-                abort(401)
-            ws = await websocket_upgrade(request)
-            while True:
-                message = await ws.receive()
-                await ws.send(message)
-    """
     ws = WebSocket(request)
     await ws.handshake()
 

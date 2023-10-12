@@ -10,9 +10,6 @@ cnt = 0
 app = Microdot()
 Response.default_content_type = 'text/html'
 
-# LDR module
-ldr = Pin(2, Pin.OUT)
-
 # root route
 @app.route('/')
 async def index(request):

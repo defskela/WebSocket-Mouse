@@ -1,7 +1,7 @@
 # boot.py -- run on boot-up
 import network
 
-# Replace the following with your WIFI Credentials
+# Replace the following with your WIFI SSID (name) and Password
 SSID = "Your SSID"
 SSI_PASSWORD = "Your Password"
 
