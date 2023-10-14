@@ -24,7 +24,6 @@ async def read_sensor(request, ws):
 @app.route("/static/<path:path>")
 def static(request, path):
     if ".." in path:
-        # directory traversal is not allowed
         return "Not found", 404
     return send_file("static/" + path)
 

@@ -1,4 +1,3 @@
-// WebSocket support
 var PKM_m = '0';
 var LKM_m = '0';
 
