@@ -1,3 +1,10 @@
+// Disabled context menu when right-clicking
+document.oncontextmenu = function (){
+    return false;
+}
+
+
+
 let PK = 0; // 0 - mobile, 1 - PK
 
 let PKM_m = "0"; // right mouse button state
@@ -26,6 +33,7 @@ if (isMobile == false) {
 
 // console.log(window.innerWidth < 768);
 
+// Hiding the buttons
 function Reverse_on_PK() {
   btns.style.display = "none";
   PK = 1;
@@ -59,23 +67,15 @@ if (PK == false) {
     }
   }
 } else {
-  touchpad.addEventListener("mousedown", TouchStart);
+  touchpad.addEventListener("mousedown", PressMouse);
+  touchpad.addEventListener("mouseup", UnPressMouse);
   touchpad.addEventListener("mousemove", HandleMove);
 
-  lkm.addEventListener("mousedown", LefthandleStart);
-  lkm.addEventListener("mouseup", LefthandleEnd);
-
-  pkm.addEventListener("mousedown", RighthandleStart);
-  pkm.addEventListener("mouseup", RighthandleEnd);
-
   function HandleMove(evt) {
-    if (first_move == 1) {
-      coordin_x = parseInt(evt.pageX);
-      coordin_y = parseInt(evt.pageY);
-      first_move = 0;
-    }
+    // Changing mouse sensitivity
     delta_x = String((parseInt(evt.pageX) - coordin_x) * 3);
     delta_y = String((parseInt(evt.pageY) - coordin_y) * 3);
+
     delta_v = delta_x + " " + delta_y;
     coordin_x = parseInt(evt.pageX);
     coordin_y = parseInt(evt.pageY);
@@ -86,7 +86,29 @@ if (PK == false) {
   }
 }
 
-function TouchStart() {
+function PressMouse(event) {
+  if (event.button == 0) {
+      LKM_m = "1";
+      sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+  }
+  else if (event.button == 2) {
+      PKM_m = "1";
+      sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+  }
+}
+
+function UnPressMouse(event) {
+  if (event.button == 0) {
+      LKM_m = "0";
+      sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+  }
+  else if (event.button == 2) {
+      PKM_m = "0";
+      sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+  }
+}
+
+function TouchStart(event) {
   first_move = 1;
 }
 
