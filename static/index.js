@@ -1,67 +1,122 @@
-var PKM_m = '0';
-var LKM_m = '0';
+let PK = 0; // 0 - mobile, 1 - PK
 
-var timer = new Date().getTime();
+let PKM_m = "0"; // right mouse button state
+let LKM_m = "0"; // left mouse button state
 
-var first_move = 0;
-var delta_x = '0';
-var delta_y = '0';
-var delta_v = '0 0';
+let timer = new Date().getTime(); // without lags
 
-var coordin_x = 0;
-var coordin_y = 0;
+let first_move = 0; // Finger transfer
+let delta_x = "0";
+let delta_y = "0";
+let delta_v = "0 0";
 
-var targetUrl = `ws://${location.host}/ws`;
-var websocket;
+let coordin_x = 0;
+let coordin_y = 0;
+
+const touchpad = document.querySelector("#touchpad");
+const lkm = document.querySelector("button.lkm");
+const pkm = document.querySelector("button.pkm");
+const btns = document.querySelector(".buttons");
+const isMobile = window.innerWidth < 768; // false if PK and true if mobile
+
+// if PK
+if (isMobile == false) {
+  Reverse_on_PK();
+}
+
+// console.log(window.innerWidth < 768);
+
+function Reverse_on_PK() {
+  btns.style.display = "none";
+  PK = 1;
+}
+
+if (PK == false) {
+  touchpad.addEventListener("touchstart", TouchStart);
+  touchpad.addEventListener("touchmove", HandleMove);
+
+  lkm.addEventListener("touchstart", LefthandleStart);
+  lkm.addEventListener("touchend", LefthandleEnd);
+
+  pkm.addEventListener("touchstart", RighthandleStart);
+  pkm.addEventListener("touchend", RighthandleEnd);
+  // We change and transfer data
+  function HandleMove(evt) {
+    if (first_move == 1) {
+      coordin_x = parseInt(evt.changedTouches[0].pageX);
+      coordin_y = parseInt(evt.changedTouches[0].pageY);
+      first_move = 0;
+    }
+    delta_x = String((parseInt(evt.changedTouches[0].pageX) - coordin_x) * 3);
+    delta_y = String((parseInt(evt.changedTouches[0].pageY) - coordin_y) * 3);
+    delta_v = delta_x + " " + delta_y;
+    coordin_x = parseInt(evt.changedTouches[0].pageX);
+    coordin_y = parseInt(evt.changedTouches[0].pageY);
+    // No more than once every 20 milliseconds
+    if (new Date().getTime() - timer > 20) {
+      timer = new Date().getTime();
+      sendMessage(delta_v + " " + LKM_m + " " + PKM_m);
+    }
+  }
+} else {
+  touchpad.addEventListener("mousedown", TouchStart);
+  touchpad.addEventListener("mousemove", HandleMove);
+
+  lkm.addEventListener("mousedown", LefthandleStart);
+  lkm.addEventListener("mouseup", LefthandleEnd);
+
+  pkm.addEventListener("mousedown", RighthandleStart);
+  pkm.addEventListener("mouseup", RighthandleEnd);
+
+  function HandleMove(evt) {
+    if (first_move == 1) {
+      coordin_x = parseInt(evt.pageX);
+      coordin_y = parseInt(evt.pageY);
+      first_move = 0;
+    }
+    delta_x = String((parseInt(evt.pageX) - coordin_x) * 3);
+    delta_y = String((parseInt(evt.pageY) - coordin_y) * 3);
+    delta_v = delta_x + " " + delta_y;
+    coordin_x = parseInt(evt.pageX);
+    coordin_y = parseInt(evt.pageY);
+    if (new Date().getTime() - timer > 20) {
+      timer = new Date().getTime();
+      sendMessage(delta_v + " " + LKM_m + " " + PKM_m);
+    }
+  }
+}
+
+function TouchStart() {
+  first_move = 1;
+}
+
+function LefthandleStart() {
+  LKM_m = "1";
+  sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+}
+
+function LefthandleEnd() {
+  LKM_m = "0";
+  sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+}
+
+function RighthandleStart() {
+  PKM_m = "1";
+  sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+}
+
+function RighthandleEnd() {
+  PKM_m = "0";
+  sendMessage("0 0" + " " + LKM_m + " " + PKM_m);
+}
+
+// WebSockets support
+const targetUrl = `ws://${location.host}/ws`; // connect websockets
+let websocket;
 window.addEventListener("load", onLoad);
 
 function onLoad() {
   initializeSocket();
-  
-  var touchpad = document.getElementById("touchpad");
-  touchpad.addEventListener("touchstart", TouchStart);
-  touchpad.addEventListener("touchmove", function (evt) {
-      if (first_move == 1) {
-        coordin_x = parseInt(evt.changedTouches[0].pageX);
-        coordin_y = parseInt(evt.changedTouches[0].pageY);
-        first_move = 0
-    }
-    delta_x = String((parseInt(evt.changedTouches[0].pageX) - coordin_x) * 3);
-    delta_y = String((parseInt(evt.changedTouches[0].pageY) - coordin_y) * 3);
-    delta_v = delta_x + ' ' + delta_y;
-    coordin_x = parseInt(evt.changedTouches[0].pageX);
-    coordin_y = parseInt(evt.changedTouches[0].pageY);
-    if (new Date().getTime() - timer > 20) {
-        timer = new Date().getTime()
-        sendMessage(delta_v + ' ' + LKM_m + ' ' + PKM_m);
-    }
-  });
-  
-  touchpad.addEventListener("mousedown", MouseStart);
-  touchpad.addEventListener("mousemove", function (evt) {
-      if (first_move == 1) {
-        coordin_x = parseInt(evt.pageX);
-        coordin_y = parseInt(evt.pageY);
-        first_move = 0
-    }
-    delta_x = String((parseInt(evt.pageX) - coordin_x) * 3);
-    delta_y = String((parseInt(evt.pageY) - coordin_y) * 3);
-    delta_v = delta_x + ' ' + delta_y;
-    coordin_x = parseInt(evt.pageX);
-    coordin_y = parseInt(evt.pageY);
-    if (new Date().getTime() - timer > 20) {
-        timer = new Date().getTime()
-        websocket.send(delta_v + ' ' + LKM_m + ' ' + PKM_m);
-    }
-  });
-  
-  var lkm = document.getElementById("LKM");
-  lkm.addEventListener("mousedown", LefthandleStart);
-  lkm.addEventListener("mouseup", LefthandleEnd);
-  
-  let pkm = document.getElementById("PKM");
-  pkm.addEventListener("mousedown", RighthandleStart);
-  pkm.addEventListener("mouseup", RighthandleEnd);
 }
 
 function initializeSocket() {
@@ -87,49 +142,3 @@ function onMessage(event) {
 function sendMessage(message) {
   websocket.send(message);
 }
-
-function TouchStart() {
-    first_move = 1;
-}
-
-function MouseStart() {
-    first_move = 1;
-}
-
-function HandleMove(evt) {
-    if (first_move == 1) {
-        coordin_x = parseInt(evt.changedTouches[0].pageX);
-        coordin_y = parseInt(evt.changedTouches[0].pageY);
-        first_move = 0
-    }
-    delta_x = String((parseInt(evt.changedTouches[0].pageX) - coordin_x) * 3);
-    delta_y = String((parseInt(evt.changedTouches[0].pageY) - coordin_y) * 3);
-    delta_v = delta_x + ' ' + delta_y;
-    coordin_x = parseInt(evt.changedTouches[0].pageX);
-    coordin_y = parseInt(evt.changedTouches[0].pageY);
-    if (new Date().getTime() - timer > 20) {
-        timer = new Date().getTime()
-        sendMessage(delta_v + ' ' + LKM_m + ' ' + PKM_m);
-    }
-}
-
-
-function LefthandleStart() {
-    LKM_m = '1';
-    sendMessage('0 0' + ' ' + LKM_m + ' ' + PKM_m);
-}
-function LefthandleEnd() {
-    LKM_m = '0';
-    sendMessage('0 0' + ' ' + LKM_m + ' ' + PKM_m);
-}
-
-function RighthandleStart() {
-    PKM_m = '1';
-    sendMessage('0 0' + ' ' + LKM_m + ' ' + PKM_m);
-}
-
-function RighthandleEnd() {
-    PKM_m = '0';
-    sendMessage('0 0' + ' ' + LKM_m + ' ' + PKM_m);
-}
-
